@@ -13,4 +13,9 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile 'org.cometd.java:cometd-java-client:2.9.1'
+    compile group: 'io.webfolder', name: 'duktape4j', version: '1.1.0'
+    compile 'com.google.code.gson:gson:2.7'
+    compile 'com.squareup.retrofit2:converter-gson:2.7.1'
+    compile group: 'com.squareup.retrofit2', name: 'retrofit', version: '2.7.1'
 }
