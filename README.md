@@ -34,27 +34,27 @@ As you see, you first need to create a game wrapper. To create one, you should c
 * AdvancedGame, if you want to process the game with methods for each event and methods to send answers to the server
 #### With subclass of Game
 Now you should override all needed methods. You get:
-* playerMessageReceived
+* playerMessageReceived - 
   Tells you when and what message from the player channel has been recieved
-* controllerMessageReceived
+* controllerMessageReceived - 
   Tells you when and what message from the status channel has been recieved
-* statusMessageReceived
+* statusMessageReceived - 
   Tells you when and what message from the status channel has been recieved
-* connectionFailure
+* connectionFailure - 
   Tells you whether and why the connection failed
-* connectionSuccess
+* connectionSuccess - 
   Tells you that the connection succeeded
 For more indepth knowledge, you can look into the provided JavaDoc
 #### With subclass of AdvancedGame
 Now you should override all needed methods here too. You get:
 * the connection confirmation methods from above
-* methods for when an unrecognized packet has been received:
+* methods for when an unrecognized packet has been received: 
   unknownPlayerEvent, unkownStatusEvent, unkownControllerEvent. Those methods work as the message methods from above
 * methods for every recognized event from the server.
 You also can call the methods:
-* sendAnswer
+* sendAnswer - 
   This method sends an answer package back to the server with its given credentials
-* sendFeedback
+* sendFeedback - 
   This method does currently not work though
 I think all here listed methods are pretty self explainatory but if you want to know more, you can have a look at the JavaDoc too.
 ##### Example
