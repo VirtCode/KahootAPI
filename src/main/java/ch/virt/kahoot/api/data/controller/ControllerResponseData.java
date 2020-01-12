@@ -13,6 +13,10 @@ public class ControllerResponseData {
     private String type;
     @SerializedName("cid")
     private String cid;
+    @SerializedName("error")
+    private String errorCode;
+    @SerializedName("description")
+    private String description;
 
     /**
      * Returns the type of the data
@@ -28,5 +32,21 @@ public class ControllerResponseData {
      */
     public String getCid() {
         return cid;
+    }
+
+    /**
+     * Returns the error code if an error occurred
+     * @return error code if an error occurred
+     */
+    public String getErrorCode() {
+        return errorCode;
+    }
+
+    /**
+     * Returns the description of the event occurred
+     * @return description of the event occurred
+     */
+    public String getDescription() {
+        return description;
     }
 }

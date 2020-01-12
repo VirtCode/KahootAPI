@@ -4,9 +4,7 @@ import ch.virt.kahoot.api.connection.GameExistsListener;
 import ch.virt.kahoot.api.connection.KahootAPI;
 import ch.virt.kahoot.api.connection.KahootCallback;
 import ch.virt.kahoot.api.connection.KahootResponse;
-import ch.virt.kahoot.api.data.HandshakeEssentials;
 import ch.virt.kahoot.api.game.Game;
-import com.google.gson.Gson;
 import io.webfolder.ducktape4j.Duktape;
 import org.cometd.client.BayeuxClient;
 import org.cometd.client.transport.LongPollingTransport;
@@ -16,24 +14,36 @@ import java.util.HashMap;
 
 import retrofit2.Response;
 
+/**
+ * This class connects and sets up the cometd connection to the kahoot servers
+ * @author Rob-- and VirtCode
+ * (In fact rob-- wrote the most of it)
+ * @version 1.0
+ */
 public class Kahoot {
 
+    /**
+     * Used to join a kahoot game without creating an instance
+     * @param username name of the player
+     * @param gameID id of game to join
+     * @param game wrapper for process the events
+     */
     public static void joinGame(String username, String gameID, Game game){
         new Kahoot(username, gameID, game).join();
     }
 
-    // Following interface and method is to run and decode the challenge,
-    // we define `console.log` to return the offset and log it via the logger.
+    /**
+     * Following interface and method is to run and decode the challenge,
+     * we define `console.log` to return the offset and log it via the logger.
+     */
     interface console {
         void log(Object... message);
     }
 
+    /**
+     * creates the console but since there are mostly no logs, they aren't printed to console
+     */
     static private console c = message -> {
-        StringBuilder sb = new StringBuilder();
-        for (Object o : message) {
-            sb.append(o);
-        }
-        System.out.println(sb.toString());
     };
 
     private String username;
@@ -41,6 +51,12 @@ public class Kahoot {
     private KahootAPI api;
     private Game game;
 
+    /**
+     * Creates a Kahoot instance with the credentials
+     * @param username name of the player
+     * @param gameCode code of game to join
+     * @param game wrapper to process the events of the game
+     */
     public Kahoot(String username, String gameCode, Game game) {
         this.username = username;
         this.gameCode = gameCode;
@@ -48,10 +64,18 @@ public class Kahoot {
         this.api = new KahootAPI();
     }
 
+    /**
+     * Join the specified kahootgame
+     */
     public void join() {
         reserveSession();
     }
 
+    /**
+     * Checks whether a game exists
+     * @param gameCode gamecode of game to check
+     * @param listener listener for the response
+     */
     public static void gameExists(final String gameCode, final GameExistsListener listener) {
         KahootAPI api = new KahootAPI();
         api.reserveSession(gameCode, new KahootCallback() {
@@ -67,6 +91,9 @@ public class Kahoot {
         });
     }
 
+    /**
+     * Reserves the session for the game
+     */
     private void reserveSession() {
         api.reserveSession(this.gameCode, new KahootCallback() {
             @Override
@@ -81,9 +108,11 @@ public class Kahoot {
                     return;
                 }
 
+                assert response.body() != null;
                 String decoded = Kahoot.runChallenge(response.body().getChallenge());
                 String token = response.headers().get("x-kahoot-session-token");
 
+                assert token != null;
                 if (token.isEmpty()) {
                     game.connectionFailed("Unable to reserve session, no session token received.");
                     return;
@@ -100,27 +129,32 @@ public class Kahoot {
         });
     }
 
+    /**
+     * Sets the comet connection to the servers up
+     * @param cometToken token for the cometd connection
+     */
     private void setupComet(String cometToken) {
-
         String url = "https://kahoot.it/cometd/" + this.gameCode + "/" + cometToken;
 
         final BayeuxClient client = new BayeuxClient(url, LongPollingTransport.create(null));
 
         client.handshake((channel, message) -> {
-            String clientID = new Gson().fromJson(message.getJSON(), HandshakeEssentials.class).getClientId();
             if (message.isSuccessful()) {
-                System.out.println("Successful handshake, attempting to join game...");
                 client.getChannel("/service/controller").publish(getLoginData());
 
-                game.setClient(client, "kahoot.it", this.gameCode, clientID);
+                game.setClient(client, "kahoot.it", this.gameCode);
             } else {
                 game.connectionFailed("Unsuccessful handshake, unable to join game.");
             }
         });
     }
 
+    /**
+     * Returns the object for the login data
+     * @return login data
+     */
     private HashMap<String, Object> getLoginData() {
-        HashMap<String, Object> data = new HashMap();
+        HashMap<String, Object> data = new HashMap<>();
         data.put("type", "login");
         data.put("gameid", this.gameCode);
         data.put("host", "kahoot.it");
@@ -129,6 +163,11 @@ public class Kahoot {
         return data;
     }
 
+    /**
+     * Runs the challenge given to the client
+     * @param challenge challenge
+     * @return decoded challenge
+     */
     private static String runChallenge(String challenge) {
         Duktape duktape = Duktape.create();
 
@@ -158,10 +197,15 @@ public class Kahoot {
         String answer = duktape.evaluate(angularFunctions + lodashFunction + consoleFunction + challenge).toString();
         duktape.close();
 
-        System.err.println("Challenge decoded: " + answer);
         return answer;
     }
 
+    /**
+     * decodes the token from the decoded challenge
+     * @param sessionToken session token
+     * @param decodedChallenge decoded challenge
+     * @return decoded token
+     */
     private static String getToken(String sessionToken, String decodedChallenge) {
         byte[] decodedToken = Base64.getDecoder().decode(sessionToken);
         byte[] challenge = decodedChallenge.getBytes();
@@ -170,9 +214,7 @@ public class Kahoot {
             decodedToken[i] ^= challenge[i % challenge.length];
         }
 
-        String token = new String(decodedToken);
-        System.err.println("Decoded token: " + token);
-        return token;
+        return new String(decodedToken);
     }
 
 }
