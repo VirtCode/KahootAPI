@@ -14,6 +14,8 @@ The current version is **1.0**
 ### Missing
 * Sending answers to questions that are exclusive to pro creators
 * Participating in team games
+## Disclaimer
+This project is only intended for educational purpose.
 ## Usage
 ### Getting the API
 Currently, you have to downloat your preffered jar in the release section. If you do not wanna mess with dependencies, you can downloat the jar with dependencies included. It will hopefully be in the maven central repository sometime.
@@ -78,7 +80,5 @@ sendAnswer(index, (int) Math.floor(Math.random() * questions[index]));
 ```
 As you might have already guessed, you have created a client that sends a random answer to each question.
 Of course you can now replaye the choice with an input got from the user and create like so a kahoot client.
-## Disclaimer
-This project is only intended for experimental usage.
 ## Licence
 This project is licenced under the MIT Licence. Please consider reading the LICENCE file for more information.
