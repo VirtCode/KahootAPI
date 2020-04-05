@@ -8,7 +8,7 @@ The current version is **1.0**
 * Functionality to join classic games
 * Receiving all events sent by the server
 * Answering classic and true or false questions
-* Obtain pretty much all information as possible about the current gameplay
+* Obtain pretty much all information possible about the current gameplay
 ### Scheduled
 * Giving feedback to the creator
 ### Missing
@@ -18,7 +18,12 @@ The current version is **1.0**
 This project is only intended for educational purpose.
 ## Usage
 ### Getting the API
-Currently, you have to downloat your preffered jar in the release section. If you do not wanna mess with dependencies, you can downloat the jar with dependencies included. It will hopefully be in the maven central repository sometime.
+There are two main ways for getting the api:
+#### Dependency Manager
+If you want to manage it with a dependency manager like Gradle or maven, you can get it from jitpack:
+https://jitpack.io/#virtcode/kahootapi/1.0
+#### Without Dependency Management
+If you want to include the libary the old fashioned way, you can download it as an jar with or without dependencies in the release section of this repository.
 ### In Code
 If you want to check whether a game with a certain pin is hosted, you can check this like that:
 ```java
